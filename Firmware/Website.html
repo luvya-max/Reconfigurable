@@ -1,0 +1,2445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-initial-scale=1.0">
+<title>Robot Control Interface</title>
+<!-- Google Fonts for a digital clock look and other other elements -->
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    @font-face {
+        font-family: 'Digital-7 Mono';
+        src: url('https://raw.githubusercontent.com/seven-segment/Digital-7-Mono/master/digital-7%20(mono).ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    /* CSS Variables for easier theme switching */
+    :root {
+        /* Default (Dark Mode) colors */
+        --main-bg-gradient-start: #111111; /* Dark grey */
+        --main-bg-gradient-end: #000000; /* Black */
+        --text-color: #f0f0f0;
+        --main-container-border: rgba(255, 255, 255, 0.15);
+        --panel-bg-gradient-start: #181818;
+        --panel-bg-gradient-end: #050505;
+        --central-panel-bg-gradient-start: #1a1a1a; /* Darker grey for central panel */
+        --central-panel-bg-gradient-end: #0a0a0a; /* Even darker grey for central panel */
+        --heading-color: #f8f8f8;
+        --heading-shadow-color: rgba(220, 220, 220, 0.9);
+        --clock-text-color: #dddddd;
+        --clock-bg-color: rgba(0, 0, 0, 0.8);
+        --clock-border-color: #aaaaaa;
+        --param-label-color: #cccccc;
+        --param-value-color: #eeeeee;
+        --log-text-color: #dddddd;
+        --log-bg-gradient-start: #0d0d0d;
+        --log-bg-gradient-end: #000000;
+        --log-border-color: rgba(150, 150, 150, 0.4);
+        --button-bg-gradient-start: #222222;
+        --button-bg-gradient-end: #000000;
+        --button-text-color: #e0e0e0;
+        --icon-color: #ffffff; /* White for icons in dark mode */
+        --icon-glow-color: rgba(255, 255, 255, 0.4);
+        --modal-bg-gradient-start: #2a2a2a;
+        --modal-bg-gradient-end: #1a1a1a;
+        --modal-text-color: #f0f0f0;
+        --modal-border-color: rgba(150, 150, 150, 0.4);
+        --modal-close-color: #f0f0f0;
+        --modal-header-color: #dddddd;
+        --component-h3-color: #ffffff; /* White for component heading in dark mode */
+        --active-glow-color: rgba(180, 180, 180, 0.7); /* Greyish glow for active states */
+        /* Updated pattern for a more technical look from the provided image */
+        --central-panel-pattern-svg: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='dotPattern' width='5' height='5' patternUnits='userSpaceOnUse'%3E%3Ccircle cx='2' cy='2' r='0.5' fill='%23DDDDDD' opacity='0.4'/%3E%3C/pattern%3E%3C/defs%3E%3Cg fill='none' stroke='%23E0E0E0' stroke-width='0.7'%3E%3C!-- Main Concentric Circles (Spirals) --%3E%3Ccircle cx='30' cy='30' r='15' opacity='0.3'/%3E%3Ccircle cx='30' cy='30' r='20' opacity='0.25'/%3E%3Ccircle cx='30' cy='30' r='25' opacity='0.2'/%3E%3Ccircle cx='30' cy='30' r='30' opacity='0.15'/%3E%3Ccircle cx='170' cy='170' r='15' opacity='0.3'/%3E%3Ccircle cx='170' cy='170' r='20' opacity='0.25'/%3E%3Ccircle cx='170' cy='170' r='25' opacity='0.2'/%3E%3Ccircle cx='170' cy='170' r='30' opacity='0.15'/%3E%3C!-- Rounded Rectangles / Capsules --%3E%3Crect x='5' y='70' width='100' height='15' rx='7.5' ry='7.5' transform='rotate(-30 50 75)' opacity='0.2'/%3E%3Crect x='90' y='10' width='100' height='15' rx='7.5' ry='7.5' transform='rotate(60 140 17.5)' opacity='0.2'/%3E%3Crect x='50' y='150' width='80' height='10' rx='5' ry='5' transform='rotate(-15 90 155)' opacity='0.15'/%3E%3C!-- Dotted Lines --%3E%3Cline x1='10' y1='100' x2='80' y2='130' stroke='url(%23dotPattern)' stroke-width='2'/%3E%3Cline x1='150' y1='50' x2='190' y2='90' stroke='url(%23dotPattern)' stroke-width='2'/%3E%3Cline x1='20' y1='180' x2='70' y2='160' stroke='url(%23dotPattern)' stroke-width='2'/%3E%3C!-- Small scattered shapes --%3E%3Ccircle cx='100' cy='50' r='3' fill='%23DDDDDD' opacity='0.4'/%3E%3Ccircle cx='120' cy='20' r='2' fill='%23DDDDDD' opacity='0.3'/%3E%3Crect x='10' y='5' width='5' height='5' fill='%23DDDDDD' opacity='0.3'/%3E%3Crect x='180' y='180' width='5' height='5' fill='%23DDDDDD' opacity='0.3'/%3E%3Cpolygon points='110,120 115,130 105,130' fill='%23DDDDDD' opacity='0.3'/%3E%3Cpolygon points='15,10 20,20 10,20' fill='%23DDDDDD' opacity='0.3'/%3E%3Ctext x='70' y='100' font-family='sans-serif' font-size='8' fill='%23DDDDDD' opacity='0.2'%3EX%3C/text%3E%3Ctext x='130' y='140' font-family='sans-serif' font-size='8' fill='%23DDDDDD' opacity='0.2'%3E+%3C/text%3E%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    body.light-mode {
+        /* Light Mode colors */
+        --main-bg-gradient-start: #ffffff;
+        --main-bg-gradient-end: #f5f5f5;
+        --text-color: #333333; /* Darker grey for general text */
+        --main-container-border: #000000;
+        --panel-bg-gradient-start: #f8f8f8;
+        --panel-bg-gradient-end: #e8e8e8;
+        --central-panel-bg-gradient-start: #ffffff;
+        --central-panel-bg-gradient-end: #f0f0f0;
+        --heading-color: #000000; /* Black for headings */
+        --heading-shadow-color: rgba(0,0,0,0.4);
+        --clock-text-color: #000000; /* Black for clock */
+        --clock-bg-color: #ffffff;
+        --clock-border-color: #000000;
+        --param-label-color: #333333; /* Dark grey for parameter labels */
+        --param-value-color: #000000; /* Black for parameter values */
+        --log-text-color: #000000; /* Black for log text */
+        --log-bg-gradient-start: #f8f8f8;
+        --log-bg-gradient-end: #e8e8e8;
+        --log-border-color: rgba(0, 0, 0, 0.3);
+        /* Updated button colors for light mode to have white fill, black outline */
+        --button-bg-gradient-start: #f0f0f0; /* Light grey for button background */
+        --button-bg-gradient-end: #ffffff;   /* White for button background */
+        --button-border-color: #000000; /* Black for general button border */
+        --button-text-color: #000000; /* Black text for contrast on light buttons */
+        --icon-color: #000000; /* Black for icons in light mode */
+        --icon-glow-color: rgba(0, 0, 0, 0.3);
+        --modal-bg-gradient-start: #ffffff;
+        --modal-bg-gradient-end: #f0f0f0;
+        --modal-text-color: #000000; /* Black for modal text */
+        --modal-border-color: #000000;
+        --modal-close-color: #000000; /* Black for modal close button */
+        --modal-header-color: #000000; /* Black for modal header */
+        --component-h3-color: #000000; /* Black for component heading in light mode */
+        --central-panel-pattern-svg: none; /* No pattern in light mode */
+        --active-glow-color: rgba(0, 0, 0, 0.4); /* Darker glow for active states in light mode */
+    }
+
+    /* Base styles for all elements */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at center, var(--main-bg-gradient-start) 0%, var(--main-bg-gradient-end) 100%);
+        font-family: 'Segoe UI', sans-serif;
+        color: var(--text-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .main-container {
+        display: grid;
+        grid-template-columns: 1fr 3fr 1fr;
+        width: 100vw;
+        height: 100vh;
+        border: 3px solid var(--main-container-border);
+        border-radius: 20px;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    body.light-mode .main-container {
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .left-half, .right-panel {
+        background: linear-gradient(180deg, var(--panel-bg-gradient-start), var(--panel-bg-gradient-end));
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 20px;
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        border-left: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+        text-align: center;
+        gap: 30px;
+        position: relative;
+    }
+
+    .left-half { grid-column: 1; border-left: none; border-radius: 20px 0 0 20px; }
+    .right-panel { grid-column: 3; border-right: none; border-radius: 0 20px 20px 0; }
+
+    body.light-mode .left-half,
+    body.light-mode .right-panel {
+        border-right: 1px solid rgba(0, 0, 0, 0.3);
+        border-left: 1px solid rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .top-bar-left {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        padding: 0 10px;
+        margin-top: 10px;
+    }
+
+    .clock-display {
+        font-family: 'Digital-7 Mono', monospace;
+        font-size: 1.6em;
+        color: var(--clock-text-color);
+        background: var(--clock-bg-color);
+        padding: 10px 18px;
+        border-radius: 12px;
+        box-shadow: inset 0 0 25px rgba(180, 180, 180, 0.3), 0 0 30px rgba(180, 180, 180, 0.15);
+        white-space: nowrap;
+        cursor: pointer;
+        text-shadow: 0 0 12px rgba(180, 180, 180, 0.8);
+        border: 2px solid var(--clock-border-color);
+        transition: all 0.3s ease;
+    }
+
+    body.light-mode .clock-display {
+        box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1);
+        text-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .left-controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 18px;
+        width: 100%;
+    }
+
+    .right-half {
+        grid-column: 2;
+        background: linear-gradient(180deg, var(--central-panel-bg-gradient-start), var(--central-panel-bg-gradient-end));
+        background-image: var(--central-panel-pattern-svg);
+        background-size: 200px 200px; /* Adjust as needed for pattern density */
+        background-repeat: repeat; /* Ensure the pattern repeats */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 35px;
+        padding: 25px;
+    }
+
+    body.light-mode .right-half {
+        background-image: none; /* Remove pattern in light mode */
+    }
+
+    .robot-controls-heading {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 4.2em;
+        color: var(--heading-color);
+        text-shadow: 0 0 25px var(--heading-shadow-color), 0 0 40px var(--heading-shadow-color);
+        margin-top: -160px;
+        margin-bottom: 10px;
+        letter-spacing: 3px;
+        transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    body.light-mode .robot-controls-heading {
+        text-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+
+    .controls-grid {
+        display: flex;
+        align-items: center;
+        gap: 50px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 45px;
+    }
+
+    canvas {
+        background-color: #0a0a0a;
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(255,255,255,0.15);
+        transition: background 0.5s ease, box-shadow 0.5s ease, filter 0.3s ease;
+        filter: brightness(0.8);
+        pointer-events: none;
+    }
+
+    #joystick {
+        border-radius: 50%;
+    }
+
+    canvas.active {
+        filter: brightness(1);
+        pointer-events: auto;
+        box-shadow: 0 0 20px rgba(255,255,255,0.3);
+    }
+
+    body.light-mode canvas {
+        background: #000000;
+        box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+    body.light-mode #joystick.dragging {
+        box-shadow: 0 0 40px rgba(0,0,0,0.7);
+    }
+
+    .sr-only {
+        position: absolute;
+        clip: rect(1px, 1px, 1px, 1px);
+        overflow: hidden;
+        height: 1px;
+        width: 1px;
+        white-space: nowrap;
+    }
+
+    .left-controls button,
+    .joystick-mode-btn { /* Added for consistency */
+        padding: 15px 30px;
+        border: 2px solid var(--button-border-color); /* Uses variable for general buttons */
+        border-radius: 15px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        outline: none;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    background 0.2s ease,
+                    box-shadow 0.2s ease,
+                    border-color 0.2s ease,
+                    opacity 0.3s ease,
+                    filter 0.3s ease;
+        background: linear-gradient(145deg, var(--button-bg-gradient-start), var(--button-bg-gradient-end));
+        color: var(--button-text-color);
+        box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.6),
+                    -8px -8px 16px rgba(50, 50, 50, 0.3),
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.7),
+                    inset -4px -4px 9px rgba(40, 40, 40, 0.4);
+        opacity: 1;
+        filter: brightness(1);
+    }
+
+    .left-controls button:hover,
+    .joystick-mode-btn:hover { /* Added for consistency */
+        transform: translateY(-5px);
+        background: linear-gradient(145deg, #303030, #0a0a0a);
+        box-shadow: 12px 12px 25px rgba(0, 0, 0, 0.7),
+                    -12px -12px 25px rgba(60, 60, 60, 0.4),
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.8),
+                    inset -4px -4px 9px rgba(50, 50, 50, 0.5);
+    }
+
+    .left-controls button:active,
+    .joystick-mode-btn:active { /* Added for consistency */
+        transform: scale(0.94);
+        background: linear-gradient(145deg, #0a0a0a, #2a2a2a);
+        box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.8),
+                    inset -5px -5px 10px rgba(25, 25, 25, 0.4);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Updated hover/active for light mode general buttons */
+    body.light-mode .left-controls button:hover,
+    body.light-mode .joystick-mode-btn:hover {
+        background: linear-gradient(145deg, #d0d0d0, #c0c0c0); /* Slightly darker grey on hover */
+        box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.3), /* Adjusted shadow */
+                    -10px -10px 20px rgba(220, 220, 220, 0.3),
+                    inset 3px 3px 7px rgba(0, 0, 0, 0.2),
+                    inset -3px -3px 7px rgba(60, 60, 60, 0.1);
+        color: #000000; /* Ensure text remains black on hover */
+    }
+
+    /* Command Recorder Buttons (specific styling) */
+    .recorder-buttons button {
+        /* Default dark mode styling inherited from .left-controls button */
+    }
+    .recorder-buttons button i {
+        /* Default dark mode styling inherited from .left-controls button i */
+    }
+
+    body.light-mode .recorder-buttons button {
+        border-color: #000000; /* Black outline in light mode - ADDED/MODIFIED */
+        color: #000000; /* Black icon in light mode */
+        background: linear-gradient(145deg, var(--button-bg-gradient-start), var(--button-bg-gradient-end)); /* White fill */
+        box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.2),
+                    -8px -8px 16px rgba(220, 220, 220, 0.2),
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.3),
+                    inset -4px -4px 9px rgba(60, 60, 60, 0.1);
+    }
+
+    body.light-mode .recorder-buttons button i {
+        color: #000000; /* Black icon in light mode */
+        text-shadow: none; /* Remove shadow in light mode */
+    }
+
+    body.light-mode .recorder-buttons button:hover {
+        background: linear-gradient(145deg, #d0d0d0, #c0c0c0); /* Slightly darker grey on hover */
+        box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.3),
+                    -10px -10px 20px rgba(220, 220, 220, 0.3),
+                    inset 3px 3px 7px rgba(0, 0, 0, 0.2),
+                    inset -3px -3px 7px rgba(60, 60, 60, 0.1);
+    }
+
+    body.light-mode .recorder-buttons button:active {
+        background: linear-gradient(145deg, #c0c0c0, #d0d0d0);
+        box-shadow: inset 4px 4px 9px rgba(0, 0, 0, 0.4),
+                    inset -4px -4px 9px rgba(20, 20, 20, 0.2);
+        border-color: rgba(0, 0, 0, 0.2);
+    }
+
+    /* Active states for Record and Play buttons with glow */
+    #recordBtn.active, #playBtn.active, #clearRecordingsBtn.active {
+        box-shadow: 0 0 25px var(--active-glow-color), /* Greyish glow */
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.8),
+                    inset -4px -4px 9px rgba(255, 120, 120, 0.5); /* Keep original inner shadow for visual depth */
+        border-color: #c0392b; /* Red for record active */
+    }
+
+    body.light-mode #recordBtn.active {
+        box-shadow: 0 0 25px var(--active-glow-color), /* Grey glow for active state */
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.6),
+                    inset -4px -4px 9px rgba(50, 50, 50, 0.3);
+        border-color: #000000; /* Black border */
+    }
+
+
+    #playBtn.active {
+        border-color: #27ae60; /* Green for play active */
+        box-shadow: 0 0 25px var(--active-glow-color), /* Greyish glow */
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.8),
+                    inset -4px -44px 9px rgba(120, 255, 170, 0.5);
+    }
+    body.light-mode #playBtn.active {
+        box-shadow: 0 0 25px var(--active-glow-color), /* Grey glow for active state */
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.6),
+                    inset -4px -4px 9px rgba(50, 50, 50, 0.3);
+        border-color: #000000; /* Black border */
+    }
+
+    body.light-mode #clearRecordingsBtn.active {
+        box-shadow: 0 0 25px var(--active-glow-color), /* Grey glow for active state */
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.6),
+                    inset -4px -4px 9px rgba(50, 50, 50, 0.3);
+        border-color: #000000; /* Black border */
+    }
+
+
+    #manualModeBtn, #themeBtn {
+        font-size: 1.3rem;
+        width: 55px;
+        height: 55px;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+    }
+
+    /* Specific styles for manualModeBtn in light mode */
+    body.light-mode #manualModeBtn {
+        background: linear-gradient(145deg, var(--button-bg-gradient-start), var(--button-bg-gradient-end));
+        border-color: var(--button-border-color); /* Black outline */
+        color: var(--button-text-color); /* Black text */
+        box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.2),
+                    -8px -8px 16px rgba(220, 220, 220, 0.2),
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.3),
+                    inset -4px -4px 9px rgba(60, 60, 60, 0.1);
+    }
+
+    body.light-mode #manualModeBtn i {
+        color: var(--icon-color); /* Black icon */
+    }
+
+    body.light-mode #manualModeBtn:hover {
+        background: linear-gradient(145deg, #d0d0d0, #c0c0c0); /* Slightly darker grey on hover */
+        box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.3), /* Adjusted shadow */
+                    -10px -10px 20px rgba(220, 220, 220, 0.3),
+                    inset 3px 3px 7px rgba(0, 0, 0, 0.2),
+                    inset -3px -3px 7px rgba(60, 60, 60, 0.1);
+    }
+
+    body.light-mode #manualModeBtn.auto-mode-active {
+        opacity: 1; /* Full opacity when active */
+        filter: brightness(1); /* Full brightness when active */
+        box-shadow: 0 0 25px var(--active-glow-color), /* Grey glow for active state */
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.6),
+                    inset -4px -4px 9px rgba(50, 50, 50, 0.3);
+        border-color: var(--button-border-color); /* Keep black border */
+    }
+
+
+    .left-controls button.dimmed,
+    .recorder-buttons button.dimmed {
+        opacity: 0.3;
+        filter: brightness(0.4);
+        cursor: default;
+        pointer-events: none;
+    }
+    .right-panel .component-button[disabled] {
+        pointer-events: auto;
+        opacity: 1;
+        filter: brightness(1);
+        cursor: pointer;
+    }
+
+    /* manualModeBtn auto-mode-active is now handled above with explicit glow */
+    /* #manualModeBtn.auto-mode-active {
+        opacity: 0.7;
+        filter: brightness(0.9);
+        cursor: pointer;
+        pointer-events: auto;
+    } */
+
+    .left-controls button i,
+    .joystick-mode-btn i { /* Added for consistency */
+        vertical-align: middle;
+        line-height: 1;
+        color: var(--icon-color); /* Uses variable for icon color */
+        transition: color 0.3s ease, margin-top 0.3s ease, filter 0.3s ease;
+    }
+
+    .header-container { display: none; }
+
+    .parameter-section {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .parameter-display {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        width: 150px;
+        padding: 15px 0;
+        background: linear-gradient(180deg, var(--param-bg-gradient-start), var(--param-bg-gradient-end));
+        border-radius: 12px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.6), inset 0 0 12px rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .parameter-display.small {
+        width: 110px;
+        padding: 12px 0;
+    }
+
+    body.light-mode .parameter-display {
+        background: linear-gradient(180deg, #f8f8f8, #e8e8e8); /* Light grey */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(0, 0, 0, 0.3);
+    }
+
+    .parameter-label {
+        font-size: 1.0em;
+        color: var(--param-label-color);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: color 0.3s ease;
+    }
+
+    .parameter-value {
+        font-family: 'Digital-7 Mono', monospace;
+        font-size: 2.2em;
+        color: var(--param-value-color);
+        text-shadow: 0 0 10px rgba(220, 220, 220, 0.8);
+        transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    body.light-mode .parameter-value {
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .joystick-mode-selection {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 25px;
+        gap: 18px;
+    }
+
+    body.light-mode .joystick-mode-selection {
+        border-top: 1px solid rgba(0,0,0,0.3);
+    }
+
+    .joystick-mode-selection .section-label {
+        font-size: 1.0em;
+        color: var(--text-color);
+        transition: color 0.3s ease;
+        margin-bottom: 8px;
+    }
+
+    .mode-buttons {
+        display: flex;
+        gap: 18px;
+        justify-content: center;
+    }
+
+    .joystick-mode-btn {
+        padding: 0;
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        font-size: 1.3rem;
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Specific styles for joystick-mode-btn in light mode */
+    body.light-mode .joystick-mode-btn {
+        background: linear-gradient(145deg, var(--button-bg-gradient-start), var(--button-bg-gradient-end));
+        border-color: var(--button-border-color); /* Black outline */
+        color: var(--button-text-color); /* Black text */
+        box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.2),
+                    -8px -8px 16px rgba(220, 220, 220, 0.2),
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.3),
+                    inset -4px -4px 9px rgba(60, 60, 60, 0.1);
+    }
+    body.light-mode .joystick-mode-btn i {
+        color: var(--icon-color); /* Black icon */
+    }
+
+    body.light-mode .joystick-mode-btn:hover {
+        background: linear-gradient(145deg, #d0d0d0, #c0c0c0); /* Slightly darker grey on hover */
+        box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.3),
+                    -10px -10px 20px rgba(220, 220, 220, 0.3),
+                    inset 3px 3px 7px rgba(0, 0, 0, 0.2),
+                    inset -3px -3px 7px rgba(60, 60, 60, 0.1);
+    }
+
+    .joystick-mode-btn.active-mode {
+        opacity: 1;
+        filter: brightness(1);
+        box-shadow: 0 0 30px rgba(200, 200, 200, 0.7),
+                    8px 8px 16px rgba(0, 0, 0, 0.6),
+                    -8px -8px 16px rgba(50, 50, 50, 0.3),
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.7),
+                    inset -4px -4px 9px rgba(40, 40, 40, 0.4);
+        border-color: #bbbbbb;
+    }
+
+    body.light-mode .joystick-mode-btn.active-mode {
+        box-shadow: 0 0 25px var(--active-glow-color), /* Grey glow for active state */
+                    6px 6px 12px rgba(0, 0, 0, 0.4),
+                    -6px -6px 12px rgba(200, 200, 200, 0.2),
+                    inset 3px 3px 7px rgba(0, 0, 0, 0.6),
+                    inset -3px -3px 7px rgba(50, 50, 50, 0.3);
+        border-color: #000000;
+    }
+
+    .command-recorder-section {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 25px;
+        gap: 18px;
+    }
+
+    body.light-mode .command-recorder-section {
+        border-top: 1px solid rgba(0,0,0,0.3);
+    }
+
+    .command-recorder-section .section-label {
+        font-size: 1.0em;
+        color: var(--text-color);
+        transition: color 0.3s ease;
+        margin-bottom: 8px;
+    }
+
+    .command-log-display {
+        width: 95%;
+        height: 120px;
+        background: radial-gradient(circle at center, var(--log-bg-gradient-start) 0%, var(--log-bg-gradient-end) 100%);
+        border: 1px solid var(--log-border-color);
+        border-radius: 12px;
+        padding: 12px;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.9em;
+        color: var(--log-text-color);
+        overflow-y: auto;
+        text-align: left;
+        white-space: pre-wrap;
+        resize: vertical;
+        box-shadow: inset 0 0 10px rgba(150, 150, 150, 0.3);
+        transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    body.light-mode .command-log-display {
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .recorder-buttons {
+        display: flex;
+        gap: 18px;
+        justify-content: center;
+    }
+
+    .recorder-buttons button {
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        /* Default dark mode styles inherited from .left-controls button */
+    }
+
+    .recorder-buttons button i {
+        /* Default dark mode styles inherited from .left-controls button i */
+    }
+
+    /* Specific styles for recorder-buttons in light mode */
+    body.light-mode .recorder-buttons button {
+        background: linear-gradient(145deg, var(--button-bg-gradient-start), var(--button-bg-gradient-end)); /* White fill */
+        border-color: var(--button-border-color); /* Black outline */
+        color: var(--button-text-color); /* Black text */
+        box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.2),
+                    -8px -8px 16px rgba(220, 220, 220, 0.2),
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.3),
+                    inset -4px -4px 9px rgba(60, 60, 60, 0.1);
+    }
+    body.light-mode .recorder-buttons button i {
+        color: var(--icon-color); /* Black icon */
+    }
+
+    body.light-mode .recorder-buttons button:hover {
+        background: linear-gradient(145deg, #d0d0d0, #c0c0c0); /* Slightly darker grey on hover */
+        box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.3),
+                    -10px -10px 20px rgba(220, 220, 220, 0.3),
+                    inset 3px 3px 7px rgba(0, 0, 0, 0.2),
+                    inset -3px -3px 7px rgba(60, 60, 60, 0.1);
+    }
+
+    body.light-mode .recorder-buttons button:active {
+        background: linear-gradient(145deg, #c0c0c0, #d0d0d0);
+        box-shadow: inset 4px 4px 9px rgba(0, 0, 0, 0.4),
+                    inset -4px -4px 9px rgba(20, 20, 20, 0.2);
+        border-color: rgba(0, 0, 0, 0.2);
+    }
+
+    /* Active states for Record and Play buttons with glow */
+    /* Handled by general #recordBtn.active, #playBtn.active, #clearRecordingsBtn.active */
+    /* with specific body.light-mode overrides further down */
+
+    #recordBtn.active, #playBtn.active, #clearRecordingsBtn.active {
+        box-shadow: 0 0 25px var(--active-glow-color), /* Greyish glow */
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.8),
+                    inset -4px -4px 9px rgba(255, 120, 120, 0.5); /* Keep original inner shadow for visual depth */
+        border-color: #c0392b; /* Red for record active in dark mode */
+    }
+
+    body.light-mode #recordBtn.active {
+        box-shadow: 0 0 25px var(--active-glow-color), /* Grey glow for active state in light mode */
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.6),
+                    inset -4px -4px 9px rgba(50, 50, 50, 0.3);
+        border-color: #000000; /* Black border for active record in light mode */
+    }
+
+    body.light-mode #playBtn.active {
+        box-shadow: 0 0 25px var(--active-glow-color), /* Grey glow for active state in light mode */
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.6),
+                    inset -4px -4px 9px rgba(50, 50, 50, 0.3);
+        border-color: #000000; /* Black border for active play in light mode */
+    }
+
+    body.light-mode #clearRecordingsBtn.active {
+        box-shadow: 0 0 25px var(--active-glow-color), /* Grey glow for active state in light mode */
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.6),
+                    inset -4px -4px 9px rgba(50, 50, 50, 0.3);
+        border-color: #000000; /* Black border for active clear in light mode */
+    }
+
+
+    #marsTextDisplay {
+        font-family: 'Digital-7 Mono', monospace;
+        font-size: 2.2em;
+        color: var(--clock-text-color);
+        background: var(--clock-bg-color);
+        padding: 10px 18px;
+        border-radius: 12px;
+        box-shadow: inset 0 0 25px rgba(180, 180, 180, 0.3), 0 0 30px rgba(180, 180, 180, 0.15);
+        white-space: nowrap;
+        text-shadow: 0 0 12px rgba(180, 180, 180, 0.8);
+        border: 2px solid var(--clock-border-color);
+        transition: all 0.3s ease;
+        margin-top: 15px;
+        margin-bottom: 25px;
+    }
+
+    body.light-mode #marsTextDisplay {
+        box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1);
+        text-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.5s ease, visibility 0.5s ease, backdrop-filter 0.5s ease;
+    }
+
+    .modal-overlay.visible {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .modal-content {
+        background: linear-gradient(145deg, var(--modal-bg-gradient-start), var(--modal-bg-gradient-end));
+        padding: 35px;
+        border-radius: 25px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(255, 255, 255, 0.08);
+        width: 90%;
+        max-width: 700px;
+        max-height: 90vh;
+        overflow-y: auto;
+        color: var(--modal-text-color);
+        position: relative;
+        font-family: 'Segoe UI', sans-serif;
+        border: 2px solid var(--modal-border-color);
+    }
+
+    body.light-mode .modal-content {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    body.light-mode .modal-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header h2 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 2.3em;
+        margin: 0;
+        color: var(--modal-header-color);
+        text-shadow: 0 0 12px rgba(220, 220, 220, 0.6);
+    }
+
+    body.light-mode .modal-header h2 {
+        text-shadow: none;
+    }
+
+    .modal-close-btn {
+        background: none;
+        border: none;
+        font-size: 2.5em;
+        color: var(--modal-close-color);
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 50%;
+        transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .modal-close-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.15);
+    }
+
+    body.light-mode .modal-close-btn:hover {
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-body {
+        font-size: 1.05em;
+        line-height: 1.8;
+    }
+
+    .modal-body p {
+        margin-bottom: 15px;
+    }
+
+    .modal-body strong {
+        color: var(--text-color); /* Uses main text color for highlights */
+        text-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+    }
+    body.light-mode .modal-body strong {
+        text-shadow: none;
+    }
+
+    .modal-body .status-ok {
+        color: #cccccc;
+    }
+
+    .modal-body .status-warning {
+        color: #f39c12;
+    }
+
+    .modal-body .status-error {
+        color: #e74c3c;
+    }
+
+    .loading-indicator {
+        display: none;
+        text-align: center;
+        padding: 25px;
+        font-size: 1.3em;
+        color: #ccc;
+    }
+    .loading-indicator.visible {
+        display: block;
+    }
+    .loading-indicator i {
+        animation: spin 1s linear infinite;
+        color: var(--clock-text-color); /* Uses clock text color for consistency */
+        text-shadow: 0 0 10px rgba(220, 220, 220, 0.8);
+    }
+
+    body.light-mode .loading-indicator i {
+        text-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .component-buttons-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 35px;
+        width: 100%;
+        margin-top: 0px;
+        align-items: center;
+    }
+
+    .component-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .component-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        border: 2px solid var(--main-container-border); /* Consistent border with main container */
+        background: linear-gradient(145deg, var(--button-bg-gradient-start), var(--button-bg-gradient-end));
+        box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.6),
+                    -8px -8px 16px rgba(50, 50, 50, 0.3),
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.7),
+                    inset -4px -4px 9px rgba(40, 40, 40, 0.4);
+        cursor: pointer;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    background 0.2s ease,
+                    box-shadow 0.2s ease,
+                    border-color 0.2s ease,
+                    opacity 0.3s ease,
+                    filter 0.3s ease;
+    }
+
+    .component-button:hover {
+        transform: translateY(-5px);
+        background: linear-gradient(145deg, #303030, #0a0a0a);
+        box-shadow: 12px 12px 25px rgba(0, 0, 0, 0.7),
+                    -12px -12px 25px rgba(60, 60, 60, 0.4),
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.8),
+                    inset -4px -4px 9px rgba(50, 50, 50, 0.5);
+    }
+
+    .component-button:active {
+        transform: scale(0.94);
+        background: linear-gradient(145deg, #0a0a0a, #2a2a2a);
+        box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.8),
+                    inset -5px -5px 10px rgba(25, 25, 25, 0.4);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Specific styles for component-button in light mode */
+    body.light-mode .component-button {
+        border-color: var(--button-border-color); /* Black border */
+        background: linear-gradient(145deg, var(--button-bg-gradient-start), var(--button-bg-gradient-end)); /* White fill */
+        box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.2),
+                    -6px -6px 12px rgba(220, 220, 220, 0.2),
+                    inset 3px 3px 7px rgba(0, 0, 0, 0.3),
+                    inset -3px -3px 7px rgba(60, 60, 60, 0.1);
+    }
+    body.light-mode .component-button i {
+        color: var(--icon-color); /* Black icon */
+    }
+    body.light-mode .component-button:hover i {
+        filter: drop-shadow(0 0 12px var(--icon-glow-color));
+    }
+    /* Specific hover/active for light mode component buttons to keep them light */
+    body.light-mode .component-button:hover {
+        background: linear-gradient(145deg, #d0d0d0, #c0c0c0); /* Slightly darker grey on hover */
+        box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.3), /* Adjusted shadow */
+                    -8px -8px 16px rgba(220, 220, 220, 0.3),
+                    inset 4px 4px 9px rgba(0, 0, 0, 0.2),
+                    inset -4px -4px 9px rgba(60, 60, 60, 0.1);
+    }
+
+    body.light-mode .component-button:active {
+        background: linear-gradient(145deg, #c0c0c0, #d0d0d0);
+        box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.4),
+                    inset -5px -5px 10px rgba(25, 25, 25, 0.2);
+    }
+
+
+    .component-button i {
+        font-size: 3.2em;
+        margin: 0;
+        padding: 0;
+        color: var(--icon-color); /* This will be white in dark mode, black in light mode */
+        transition: color 0.3s ease, filter 0.3s ease;
+    }
+
+    .component-button:hover i {
+        filter: drop-shadow(0 0 12px var(--icon-glow-color));
+    }
+
+    .component-label {
+        font-size: 1.05em;
+        font-weight: bold;
+        color: var(--text-color); /* Uses main text color */
+        line-height: 1.2;
+        text-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+    }
+    body.light-mode .component-label {
+        text-shadow: none;
+        color: #000000; /* Black for component labels in light mode */
+    }
+
+    .right-panel h3.component-details-heading {
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 1.2em;
+        margin-top: 10px;
+        color: var(--component-h3-color);
+        transition: color 0.3s ease;
+    }
+
+    /* Media queries for responsiveness */
+    @media (max-width: 768px) {
+        .main-container {
+            grid-template-columns: 1fr;
+            border-radius: 0;
+        }
+
+        .left-half, .right-half, .right-panel {
+            grid-column: 1 / -1;
+            width: 100vw;
+            height: auto;
+            padding: 15px;
+            border-right: none;
+            border-left: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: unset;
+            border-radius: 0;
+            box-shadow: none;
+        }
+        body.light-mode .left-half,
+        body.light-mode .right-panel {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+        }
+
+        .robot-controls-heading {
+            font-size: 2.8em;
+            margin-top: 25px;
+        }
+
+        .controls-grid {
+            flex-direction: column;
+            gap: 25px;
+            margin-top: 35px;
+        }
+
+        #joystick {
+            width: 280px;
+            height: 280px;
+        }
+        #servoLeft, #servoRight {
+            width: 70px;
+            height: 280px;
+        }
+        .left-controls, .recorder-buttons, .mode-buttons {
+            gap: 12px;
+        }
+        .left-controls button, .recorder-buttons button, .joystick-mode-btn, #manualModeBtn, #themeBtn {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+            padding: 0;
+        }
+        .parameter-display {
+            width: 120px;
+            padding: 10px 0;
+        }
+        .parameter-display.small {
+            width: 90px;
+            padding: 8px 0;
+        }
+        .parameter-label {
+            font-size: 0.9em;
+        }
+        .parameter-value {
+            font-size: 1.6em;
+        }
+        .parameter-display.small .parameter-value {
+            font-size: 1.3em;
+        }
+        .command-log-display {
+            max-height: 90px;
+            width: 95%;
+        }
+        #marsTextDisplay {
+            font-size: 1.8em;
+        }
+
+        .modal-content {
+            width: 95%;
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(150, 150, 150, 0.3);
+        }
+        .modal-header h2 {
+            font-size: 1.8em;
+        }
+        .modal-close-btn {
+            font-size: 1.8em;
+        }
+
+        .component-buttons-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 15px;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .component-item {
+            gap: 8px;
+        }
+        .component-button {
+            width: 80px;
+            height: 80px;
+        }
+        .component-button i {
+            font-size: 2.5em;
+        }
+        .component-label {
+            font-size: 0.85em;
+        }
+    }
+
+    @media (max-height: 700px) and (min-width: 769px) {
+        .left-half, .right-half, .right-panel {
+            padding: 15px;
+            gap: 25px;
+        }
+        .clock-display {
+            font-size: 1.4em;
+            padding: 8px 15px;
+        }
+        .left-controls, .recorder-buttons, .mode-buttons {
+            gap: 15px;
+        }
+        .left-controls button, .recorder-buttons button, .joystick-mode-btn, #manualModeBtn, #themeBtn {
+            width: 48px;
+            height: 48px;
+            font-size: 1.15rem;
+        }
+        .parameter-display {
+            width: 130px;
+            font-size: 0.9em;
+            padding: 10px 0;
+        }
+        .parameter-display.small {
+            width: 100px;
+            font-size: 0.8em;
+            padding: 8px 0;
+        }
+        .parameter-value {
+            font-size: 1.8em;
+        }
+        .parameter-display.small .parameter-value {
+            font-size: 1.5em;
+        }
+        .joystick-mode-selection, .command-recorder-section {
+            padding-top: 20px;
+            gap: 15px;
+        }
+        .command-log-display {
+            max-height: 80px;
+        }
+        #joystick {
+            width: 380px;
+            height: 380px;
+        }
+        #servoLeft, #servoRight {
+            width: 70px;
+            height: 300px;
+        }
+        .controls-grid {
+            margin-top: 35px;
+        }
+        #marsTextDisplay {
+            font-size: 1.8em;
+        }
+        .component-item {
+            gap: 10px;
+        }
+        .component-button {
+            width: 100px;
+            height: 100px;
+        }
+        .component-button i {
+            font-size: 2.8em;
+        }
+        .component-label {
+            font-size: 0.95em;
+        }
+    }
+
+</style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="left-half">
+        <div class="top-bar-left">
+            <div id="liveClock" class="clock-display">--:--:--</div>
+        </div>
+
+        <div class="left-controls">
+            <!-- Manual Mode button -->
+            <button id="manualModeBtn" aria-label="Toggle Manual/Automatic Mode"><i class="fas fa-screwdriver-wrench"></i></button>
+            <button id="startStopBtn" aria-label="Start or Stop Robot Control"><i class="fas fa-play"></i></button>
+            <button id="themeBtn" aria-label="Toggle Light or Dark Theme"><i class="fas fa-moon"></i></button>
+        </div>
+
+        <!-- Sections for Motor X, Motor Y, Servo A, and Servo B -->
+        <div class="parameter-section">
+            <div class="parameter-display">
+                <span class="parameter-label">Motor X</span>
+                <span id="motorXVal" class="parameter-value">0</span>
+            </div>
+            <div class="parameter-display">
+                <span class="parameter-label">Motor Y</span>
+                <span id="motorYVal" class="parameter-value">0</span>
+            </div>
+            <!-- New smaller boxes for Servo A and Servo B -->
+            <div class="parameter-display small">
+                <span class="parameter-label">Servo A</span>
+                <span id="servoAVal" class="parameter-value">90</span>
+            </div>
+            <div class="parameter-display small">
+                <span class="parameter-label">Servo B</span>
+                <span id="servoBVal" class="parameter-value">90</span>
+            </div>
+        </div>
+
+        <!-- Joystick Mode Selection Section -->
+        <div class="joystick-mode-selection">
+            <span class="section-label">Joystick Behavior</span>
+            <div class="mode-buttons">
+                <button id="modeSpringBtn" class="joystick-mode-btn" aria-label="Spring Joystick Mode"><i class="fas fa-crosshairs"></i></button>
+                <button id="modeHoldBtn" class="joystick-mode-btn" aria-label="Hold Joystick Mode"><i class="fas fa-hand-paper"></i></button>
+                <button id="modeSnapBtn" class="joystick-mode-btn" aria-label="Snap-to-Axes Joystick Mode"><i class="fas fa-arrows-alt"></i></button>
+            </div>
+        </div>
+
+        <!-- Command Recorder Section -->
+        <div class="command-recorder-section">
+            <span class="section-label">Command Recorder</span>
+            <div id="commandLogDisplay" class="command-log-display"></div>
+            <div class="recorder-buttons">
+                <button id="recordBtn" aria-label="Record Commands"><i class="fas fa-dot-circle"></i></button>
+                <button id="playBtn" aria-label="Play Recorded Commands"><i class="fas fa-play"></i></button>
+                <button id="clearRecordingsBtn" aria-label="Clear Recorded Commands"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+
+        <!-- New MARS text display -->
+        <div id="marsTextDisplay">MARS</div>
+
+    </div>
+
+    <div class="right-half">
+        <h1 class="robot-controls-heading">Robot Controls</h1>
+        <div class="controls-grid">
+            <!-- Servo A Control Canvas -->
+            <canvas id="servoLeft" width="80" height="350"
+                      role="slider"
+                      aria-valuemin="0"
+                      aria-valuemax="180"
+                      aria-valuenow="90"
+                      aria-labelledby="servoALabel"
+                      tabindex="-1"></canvas>
+            <div id="servoALabel" class="sr-only">Servo A control slider</div>
+
+            <!-- Joystick Control Canvas -->
+            <canvas id="joystick" width="450" height="450"
+                      role="slider"
+                      aria-valuemin="-100" /* Represents -100% to 100% deflection */
+                      aria-valuemax="100"
+                      aria-valuenow="0" /* Initial value */
+                      aria-label="Two-dimensional joystick for Motor X and Motor Y control"
+                      tabindex="-1"></canvas>
+
+            <!-- Servo B Control Canvas -->
+            <canvas id="servoRight" width="80" height="350"
+                      role="slider"
+                      aria-valuemin="0"
+                      aria-valuemax="180"
+                      aria-valuenow="90"
+                      aria-labelledby="servoBLabel"
+                      tabindex="-1"></canvas>
+            <div id="servoBLabel" class="sr-only">Servo B control slider</div>
+        </div>
+    </div>
+
+    <!-- New Right Panel -->
+    <div class="right-panel">
+        <h3 class="component-details-heading">Component Details</h3>
+        <!-- New Grid for Component Buttons (now a vertical flex container) -->
+        <div class="component-buttons-grid">
+            <div class="component-item">
+                <button class="component-button" data-component="microcontroller">
+                    <i class="fas fa-microchip"></i>
+                </button>
+                <span class="component-label">Microcontroller</span>
+            </div>
+            <div class="component-item">
+                <button class="component-button" data-component="motorDriver">
+                    <i class="fas fa-cogs"></i>
+                </button>
+                <span class="component-label">Motors</span>
+            </div>
+            <div class="component-item">
+                <button class="component-button" data-component="servos">
+                    <i class="fas fa-arrows-alt-v"></i>
+                </button>
+                <span class="component-label">Servos</span>
+            </div>
+            <div class="component-item">
+                <button class="component-button" data-component="boostConverter">
+                    <i class="fas fa-power-off"></i>
+                </button>
+                <span class="component-label">Boost</span>
+            </div>
+            <div class="component-item">
+                <button class="component-button" data-component="battery">
+                    <i class="fas fa-car-battery"></i>
+                </button>
+                <span class="component-label">Battery</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Structure for Detailed Status -->
+<div id="statusModalOverlay" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Detailed Robot Status</h2>
+            <button id="modalCloseBtn" class="modal-close-btn">&times;</button>
+        </div>
+        <div class="loading-indicator" id="loadingIndicator">
+            <i class="fas fa-spinner fa-spin"></i> Generating Report...
+        </div>
+        <div class="modal-body" id="modalBodyContent">
+            <!-- Detailed status will be inserted here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Canvas elements and contexts
+    const joy = document.getElementById('joystick');
+    const ctxJ = joy.getContext('2d');
+    const servoLeftCanvas = document.getElementById('servoLeft');
+    const servoRightCanvas = document.getElementById('servoRight');
+    const servoLeftCtx = servoLeftCanvas.getContext('2d');
+    const servoRightCtx = servoRightCanvas.getContext('2d');
+
+    // Joystick state variables
+    const center = { x: joy.width / 2, y: joy.height / 2 };
+    let stick = { x: center.x, y: center.y }; // Current position of the joystick knob
+    let motorX = 0, motorY = 0; // Values sent to motors (scaled from joystick position)
+    let dragging = false; // Is the joystick being dragged?
+
+    // Servo state variables
+    let servoA = 90; // Angle for Servo A
+    let servoB = 90; // Angle for Servo B
+    let draggingLeft = false, draggingRight = false; // Is a servo slider being dragged?
+
+    // Control elements
+    const manualModeBtn = document.getElementById('manualModeBtn');
+    const startStopBtn = document.getElementById('startStopBtn');
+    const themeBtn = document.getElementById('themeBtn');
+    const liveClock = document.getElementById('liveClock');
+
+    // Joystick Mode Buttons
+    const modeSpringBtn = document.getElementById('modeSpringBtn');
+    const modeHoldBtn = document.getElementById('modeHoldBtn');
+    const modeSnapBtn = document.getElementById('modeSnapBtn');
+    const joystickModeButtons = [modeSpringBtn, modeHoldBtn, modeSnapBtn];
+
+    // Parameter display elements for motor X and Y
+    const motorXVal = document.getElementById('motorXVal');
+    const motorYVal = document.getElementById('motorYVal');
+    const servoAVal = document.getElementById('servoAVal');
+    const servoBVal = document.getElementById('servoBVal');
+
+    // Command Recorder Elements
+    const commandLogDisplay = document.getElementById('commandLogDisplay');
+    const recordBtn = document.getElementById('recordBtn');
+    const playBtn = document.getElementById('playBtn');
+    const clearRecordingsBtn = document.getElementById('clearRecordingsBtn'); // New button
+
+    // Modal elements
+    const statusModalOverlay = document.getElementById('statusModalOverlay');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+    const modalBodyContent = document.getElementById('modalBodyContent');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const modalTitle = document.getElementById('modalTitle');
+    const componentButtons = document.querySelectorAll('.component-button');
+
+    // App state variables
+    let isRobotRunning = false;
+    let isManualMode = true;
+    let is24HourFormat = true;
+    let joystickMode = 'spring';
+
+    // Recorder state variables
+    let isRecording = false;
+    let isPlaying = false;
+    let currentRecordingSession = []; // Stores commands for the current recording in progress
+    let allRecordedSessions = []; // Stores all completed recording sessions
+    let recordIntervalId = null;
+    let playbackIntervalId = null;
+    let playbackIndex = 0; // Index within the current session being played back
+    let currentPlaybackSessionIndex = -1; // Index in allRecordedSessions for the session currently being played
+
+    const snapThreshold = 20;
+    const recordInterval = 100;
+    const playbackSpeed = 100;
+
+    /**
+     * Updates the real-time clock display.
+     */
+    function updateClock() {
+        const now = new Date();
+        const options = {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: !is24HourFormat
+        };
+        const formattedTime = new Intl.DateTimeFormat('en-US', options).format(now);
+        liveClock.textContent = formattedTime;
+    }
+
+    /**
+     * Draws the joystick on its canvas.
+     */
+    function drawJoystick() {
+        ctxJ.clearRect(0, 0, joy.width, joy.height);
+
+        const isLightMode = document.body.classList.contains('light-mode');
+
+        // Define colors based on the current theme for the basic joystick
+        const outerCircleBorderColor = isLightMode ? "#000000" : "#CCCCCC"; // Black in light, light grey in dark
+        const outerCircleFillColor = isLightMode ? "#E0E0E0" : "#333333";   // Light grey in light, dark grey in dark
+        const innerKnobColor = isLightMode ? "#888888" : "#888888";         // Consistent medium grey
+        const innerKnobBorderColor = isLightMode ? "#000000" : "#CCCCCC"; // Black in light, light grey in dark
+
+
+        // Draw the outer circle (joystick boundary)
+        ctxJ.beginPath();
+        ctxJ.arc(center.x, center.y, joy.width / 2 - 20, 0, 2 * Math.PI); // Slightly smaller radius for more visible border
+        ctxJ.strokeStyle = outerCircleBorderColor;
+        ctxJ.lineWidth = 4;
+        ctxJ.fillStyle = outerCircleFillColor;
+        ctxJ.fill();
+        ctxJ.stroke();
+
+        // Draw the joystick knob
+        const knobRadius = 30; // Slightly smaller knob
+        ctxJ.beginPath();
+        ctxJ.arc(stick.x, stick.y, knobRadius, 0, 2 * Math.PI);
+        ctxJ.fillStyle = innerKnobColor;
+        ctxJ.fill();
+        ctxJ.strokeStyle = innerKnobBorderColor;
+        ctxJ.lineWidth = 2;
+        ctxJ.stroke();
+
+        // Apply box shadow to the canvas element for a consistent look
+        if (isLightMode) {
+            joy.style.boxShadow = dragging ? "0 0 40px rgba(0,0,0,0.7)" : "0 0 15px rgba(0,0,0,0.5)";
+        } else {
+            joy.style.boxShadow = dragging ? "0 0 40px rgba(128,128,128,0.4)" : "0 0 15px rgba(255,255,255,0.15)";
+        }
+    }
+
+    /**
+     * Draws a servo slider on its canvas.
+     * @param {CanvasRenderingContext2D} ctx - The 2D rendering context of the canvas.
+     * @param {number} value - The current angle value (0-180).
+     * @param {string} label - The label for the servo (e.g., 'Servo A').
+     */
+    function drawServo(ctx, value, label) {
+        const c = ctx.canvas;
+        ctx.clearRect(0, 0, c.width, c.height);
+
+        // Define colors for servo based on user request
+        const trackFillColor = "#363636"; // Grey for the track
+        const trackBorderColor = "#FFFFFF"; // White for the track border
+        const knobColor = "#CCCCCC"; // Light grey for the knob
+        const knobBorderColor = "#FFFFFF"; // White for the knob border
+        const knobShadowColor = "rgba(0,0,0,0.5)";
+        const textColor = "#FFFFFF"; // White text for readability on grey track
+
+        // Slider track
+        ctx.fillStyle = trackFillColor;
+        ctx.fillRect(c.width / 2 - 12, 20, 24, c.height - 40);
+
+        ctx.strokeStyle = trackBorderColor;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(c.width / 2 - 12, 20, 24, c.height - 40);
+
+        let y = 20 + ((180 - value) / 180) * (c.height - 40);
+
+        // Slider knob
+        ctx.beginPath();
+        ctx.arc(c.width / 2, y, 14, 0, 2 * Math.PI);
+        ctx.fillStyle = knobColor;
+        ctx.fill();
+
+        ctx.shadowColor = knobShadowColor;
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+
+        ctx.strokeStyle = knobBorderColor;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+
+        // Text labels
+        ctx.fillStyle = textColor;
+        ctx.font = "16px 'Segoe UI', sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(label, c.width / 2, c.height - 5);
+        ctx.fillText(value, c.width / 2, 18);
+    }
+
+    // No direct recursive call to move(e) within this function
+    // The `pointermove` and `keydown` event listeners will trigger this function.
+    function move(e) {
+        // Allow joystick control only if robot is running and in manual mode
+        if (!isRobotRunning || !isManualMode || isPlaying) return;
+
+        const r = joy.getBoundingClientRect();
+        let clientX, clientY;
+
+        // Handle pointer events (mouse/touch)
+        if (e.type.startsWith('pointer')) {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+        // Handle keyboard events (Arrow keys)
+        else if (e.type === 'keydown') {
+            let step = 10;
+            clientX = r.left + stick.x;
+            clientY = r.top + stick.y;
+
+            if (e.key === 'ArrowUp') clientY -= step;
+            else if (e.key === 'ArrowDown') clientY += step;
+            else if (e.key === 'ArrowLeft') clientX -= step;
+            else if (e.key === 'ArrowRight') clientX += step;
+            else return; // If it's a keydown but not an arrow key, exit
+
+            e.preventDefault(); // Prevent default scroll behavior for arrow keys
+        } else {
+            return; // If neither pointer nor keydown, exit
+        }
+
+        let x = clientX - r.left;
+        let y = clientY - r.top;
+
+        let dx = x - center.x;
+        let dy = y - center.y;
+        let d = Math.hypot(dx, dy);
+
+        const maxRadius = (joy.width / 2) - 25;
+        if (d > maxRadius) {
+            dx *= maxRadius / d;
+            dy *= maxRadius / d;
+            d = maxRadius;
+        }
+        stick.x = center.x + dx;
+        stick.y = center.y + dy;
+
+        const deadzoneRadius = 10;
+        if (d < deadzoneRadius) {
+            motorX = 0;
+            motorY = 0;
+            joy.setAttribute('aria-valuenow', 0);
+        } else {
+            let normalizedDx = dx / maxRadius;
+            let normalizedDy = -dy / maxRadius;
+
+            let speed = Math.sqrt(normalizedDx * normalizedDx + normalizedDy * normalizedDy);
+            speed = Math.min(speed, 1);
+
+            let angle = Math.atan2(normalizedDy, normalizedDx);
+
+            let v = speed;
+            let z = angle;
+
+            motorX = Math.round(255 * (v * Math.cos(z) + v * Math.sin(z)));
+            motorY = Math.round(255 * (v * Math.cos(z) - v * Math.sin(z)));
+
+            if (Math.abs(normalizedDy) > Math.abs(normalizedDx) && Math.abs(normalizedDy) > 0.1) {
+                motorX = Math.round(normalizedDy * 255);
+                motorY = Math.round(normalizedDy * 255);
+            } else if (Math.abs(normalizedDx) > Math.abs(normalizedDy) && Math.abs(normalizedDx) > 0.1) {
+                motorX = Math.round(normalizedDx * 255);
+                motorY = Math.round(-normalizedDx * 255);
+            } else {
+                 motorX = Math.round(255 * (normalizedDy + normalizedDx));
+                 motorY = Math.round(255 * (normalizedDy - normalizedDx));
+            }
+
+            motorX = Math.round(Math.max(-255, Math.min(255, motorX)));
+            motorY = Math.round(Math.max(-255, Math.min(255, motorY)));
+
+            joy.setAttribute('aria-valuenow', Math.round(d / maxRadius * 100));
+        }
+
+        motorXVal.textContent = motorX;
+        motorYVal.textContent = motorY;
+
+        updateAriaValues();
+        drawAll();
+
+        if (isRecording) {
+            recordCurrentState();
+        }
+    }
+
+    /**
+     * Resets joystick and optionally servo positions to default.
+     * @param {boolean} resetServos - If true, resets servoA and servoB to 90.
+     */
+    function resetJoystickAndServos(resetServos = false) {
+        stick.x = center.x;
+        stick.y = center.y;
+        motorX = 0;
+        motorY = 0;
+        motorXVal.textContent = motorX;
+        motorYVal.textContent = motorY;
+        joy.setAttribute('aria-valuenow', 0);
+
+        if (resetServos) {
+            servoA = 90;
+            servoB = 90;
+        }
+
+        drawJoystick();
+        updateAriaValues();
+        drawAll();
+    }
+
+    /**
+     * Updates ARIA values for accessibility.
+     */
+    function updateAriaValues() {
+        servoLeftCanvas.setAttribute('aria-valuenow', servoA);
+        servoRightCanvas.setAttribute('aria-valuenow', servoB);
+    }
+
+    /**
+     * Updates the displayed parameter values for motors and servos.
+     */
+    function updateParameterDisplays() {
+        motorXVal.textContent = motorX;
+        motorYVal.textContent = motorY;
+        servoAVal.textContent = servoA;
+        servoBVal.textContent = servoB;
+    }
+
+    /**
+     * Redraws all control canvases.
+     */
+    function drawAll() {
+        drawJoystick();
+        drawServo(servoLeftCtx, servoA, 'Servo A');
+        drawServo(servoRightCtx, servoB, 'Servo B');
+        updateParameterDisplays();
+    }
+
+    /**
+     * Adjusts a servo slider independently.
+     * @param {Event} e - The event object.
+     * @param {string} which - 'A' for Servo A, 'B' for Servo B.
+     */
+    function adjustServo(e, which) {
+        // Allow servo control only if robot is running and in manual mode
+        if (!isRobotRunning || !isManualMode || isPlaying) return;
+        // Do not allow servo adjustment during playback
+        if (isPlaying) return;
+
+        const rect = e.target.getBoundingClientRect();
+        const c = e.target;
+        let y = e.clientY - rect.top;
+        y = Math.max(20, Math.min(y, c.height - 20));
+
+        const range = c.height - 40;
+        let value = Math.round(180 - ((y - 20) / range) * 180);
+
+        if (which === 'A') {
+            servoA = value;
+        } else {
+            servoB = value;
+        }
+
+        updateAriaValues();
+        drawAll();
+        if (isRecording) {
+            recordCurrentState();
+        }
+    }
+
+    /**
+     * Updates the active/dimmed state of buttons based on robot and recorder status.
+     * @param {boolean} robotIsActive - True if the robot is currently running.
+     */
+    function toggleActiveState(robotIsActive) {
+        const canvases = [joy, servoLeftCanvas, servoRightCanvas];
+        canvases.forEach(canvas => {
+            if (robotIsActive && isManualMode && !isPlaying) { // Canvases active only if robot running, manual, and not playing back
+                canvas.classList.add('active');
+                canvas.setAttribute('tabindex', '0');
+            } else {
+                canvas.classList.remove('active');
+                canvas.setAttribute('tabindex', '-1');
+            }
+        });
+
+        // Manual Mode button state update
+        if (robotIsActive) {
+            manualModeBtn.removeAttribute('disabled');
+            manualModeBtn.style.pointerEvents = 'auto';
+            if (isManualMode) { // If manual mode is active
+                manualModeBtn.classList.remove('auto-mode-active');
+                manualModeBtn.classList.remove('dimmed');
+                manualModeBtn.style.opacity = '1';
+                manualModeBtn.style.filter = 'brightness(1)';
+            } else { // If manual mode is NOT active (i.e., auto-mode active)
+                manualModeBtn.classList.add('auto-mode-active');
+                manualModeBtn.classList.add('dimmed');
+                manualModeBtn.style.opacity = '0.7';
+                manualModeBtn.style.filter = 'brightness(0.9)';
+            }
+        } else {
+            manualModeBtn.setAttribute('disabled', 'true');
+            manualModeBtn.classList.add('dimmed');
+            manualModeBtn.style.opacity = '0.5';
+            manualModeBtn.style.filter = 'brightness(0.6)';
+            manualModeBtn.style.pointerEvents = 'none';
+        }
+
+
+        joystickModeButtons.forEach(button => {
+            button.removeAttribute('disabled');
+            button.classList.remove('dimmed');
+            button.style.pointerEvents = 'auto';
+            if (button.id === `mode${joystickMode.charAt(0).toUpperCase() + joystickMode.slice(1)}Btn`) {
+                button.classList.add('active-mode');
+            } else {
+                button.classList.remove('active-mode');
+            }
+        });
+
+        // Record Button State
+        if (!robotIsActive || !isManualMode || isPlaying) {
+            recordBtn.setAttribute('disabled', 'true');
+            recordBtn.classList.add('dimmed');
+            recordBtn.classList.remove('active');
+            recordBtn.innerHTML = '<i class="fas fa-dot-circle"></i>';
+            recordBtn.style.pointerEvents = 'none';
+        } else {
+            recordBtn.removeAttribute('disabled');
+            recordBtn.style.pointerEvents = 'auto';
+            if (isRecording) {
+                recordBtn.classList.add('active');
+                recordBtn.innerHTML = '<i class="fas fa-stop-circle"></i>';
+            } else {
+                recordBtn.classList.remove('active');
+                recordBtn.innerHTML = '<i class="fas fa-dot-circle"></i>';
+            }
+        }
+
+        // Play Button State (independent of isRecording, but dependent on sessions)
+        // MODIFIED: Removed !robotIsActive from condition
+        if (isRecording || isPlaying || allRecordedSessions.length === 0) { // Can't play if recording, already playing, or no sessions
+            playBtn.setAttribute('disabled', 'true');
+            playBtn.classList.add('dimmed');
+            playBtn.classList.remove('active');
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            playBtn.style.pointerEvents = 'none';
+        } else {
+            playBtn.removeAttribute('disabled');
+            playBtn.style.pointerEvents = 'auto';
+            if (isPlaying) { // If playing, show stop icon
+                playBtn.classList.add('active');
+                playBtn.innerHTML = '<i class="fas fa-stop"></i>';
+            } else { // If not playing, show play icon
+                playBtn.classList.remove('active');
+                playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            }
+        }
+
+        // Clear Recordings Button State
+        if (allRecordedSessions.length === 0) { // Only enable if there are recordings
+            clearRecordingsBtn.setAttribute('disabled', 'true');
+            clearRecordingsBtn.classList.add('dimmed');
+            clearRecordingsBtn.style.pointerEvents = 'none';
+        } else {
+            clearRecordingsBtn.removeAttribute('disabled');
+            clearRecordingsBtn.classList.remove('dimmed');
+            clearRecordingsBtn.style.pointerEvents = 'auto';
+        }
+
+
+        componentButtons.forEach(button => {
+            button.removeAttribute('disabled');
+            button.style.pointerEvents = 'auto';
+        });
+    }
+
+    /**
+     * Updates the UI elements related to robot status.
+     * This function no longer clears recordings when the robot stops.
+     */
+    function updateStatusElements() {
+        if (isRobotRunning) {
+            startStopBtn.innerHTML = '<i class="fas fa-stop"></i>';
+            isManualMode = true; // Automatically set to manual mode when robot starts
+            manualModeBtn.classList.remove('auto-mode-active'); // Ensure manual mode icon is not greyed out
+            manualModeBtn.classList.remove('dimmed');
+            manualModeBtn.style.opacity = '1';
+            manualModeBtn.style.filter = 'brightness(1)';
+        } else {
+            startStopBtn.innerHTML = '<i class="fas fa-play"></i>';
+            // When robot stops, reset all controls including servos
+            resetJoystickAndServos(true); // Pass true to reset servos
+            // IMPORTANT: Recordings are NO LONGER cleared on robot stop.
+            // They will only be cleared by the new "Clear" button.
+            if (isRecording) stopRecording();
+            if (isPlaying) stopPlayback();
+            isManualMode = false; // Optionally set to non-manual when robot stops
+        }
+        toggleActiveState(isRobotRunning);
+        drawAll();
+    }
+
+    /**
+     * Records the current state of joystick and servos to the currentRecordingSession.
+     */
+    function recordCurrentState() {
+        const command = {
+            stickX: stick.x,
+            stickY: stick.y,
+            servoA: servoA,
+            servoB: servoB,
+            timestamp: new Date().toLocaleTimeString()
+        };
+        currentRecordingSession.push(command);
+        commandLogDisplay.textContent += `[${command.timestamp}] J: (${Math.round(command.stickX - center.x)},${Math.round(center.y - command.stickY)}) SA: ${command.servoA} SB: ${command.servoB}\n`;
+        commandLogDisplay.scrollTop = commandLogDisplay.scrollHeight;
+        toggleActiveState(isRobotRunning); // Update clear button state
+    }
+
+    /**
+     * Starts recording commands.
+     */
+    function startRecording() {
+        if (isRecording) { // If already recording, stop it
+            stopRecording();
+            return;
+        }
+        if (!isRobotRunning || !isManualMode || isPlaying) return; // Cannot record if robot not running, not manual, or playing
+
+        isRecording = true;
+        currentRecordingSession = []; // Clear for new session
+        commandLogDisplay.textContent = 'Recording started...\n';
+        recordIntervalId = setInterval(recordCurrentState, recordInterval);
+        toggleActiveState(isRobotRunning);
+    }
+
+    /**
+     * Stops recording commands.
+     */
+    function stopRecording() {
+        if (!isRecording) return;
+        isRecording = false;
+        clearInterval(recordIntervalId);
+        recordIntervalId = null;
+
+        if (currentRecordingSession.length > 0) {
+            allRecordedSessions.push(currentRecordingSession); // Save the completed session
+            commandLogDisplay.textContent += `Recording stopped. Session saved. Total sessions: ${allRecordedSessions.length}\n`;
+        } else {
+            commandLogDisplay.textContent += `Recording stopped. No commands recorded in this session.\n`;
+        }
+        commandLogDisplay.scrollTop = commandLogDisplay.scrollHeight;
+        currentRecordingSession = []; // Reset current recording for next time
+        toggleActiveState(isRobotRunning);
+    }
+
+    /**
+     * Starts playback of recorded commands.
+     */
+    function startPlayback() {
+        if (isPlaying) { // If already playing, stop it
+            stopPlayback();
+            return;
+        }
+        // MODIFIED: Removed !isRobotRunning from condition. Playback can start regardless of robot's main state.
+        if (isRecording || allRecordedSessions.length === 0) return; // Cannot play if recording or no sessions
+
+        isPlaying = true;
+        currentPlaybackSessionIndex = allRecordedSessions.length - 1; // Always start with the latest
+        playbackIndex = 0; // Start from the beginning of the selected session
+        commandLogDisplay.textContent = `Playback started for session ${currentPlaybackSessionIndex + 1}...\n`;
+        toggleActiveState(isRobotRunning);
+        playbackIntervalId = setInterval(executePlaybackCommand, playbackSpeed);
+    }
+
+    /**
+     * Executes the next command in the playback sequence.
+     */
+    function executePlaybackCommand() {
+        const currentSession = allRecordedSessions[currentPlaybackSessionIndex];
+        if (!currentSession || playbackIndex >= currentSession.length) {
+            // Playback of current session finished
+            stopPlayback();
+            if (currentPlaybackSessionIndex > 0) { // If there are previous sessions to play
+                promptReplayPrevious();
+            } else {
+                commandLogDisplay.textContent += '\nAll recorded sessions played.\n';
+                currentPlaybackSessionIndex = -1; // Reset index
+            }
+            return;
+        }
+
+        const command = currentSession[playbackIndex];
+        stick.x = command.stickX;
+        stick.y = command.stickY;
+        servoA = command.servoA;
+        servoB = command.servoB;
+
+        drawAll();
+
+        commandLogDisplay.textContent += `[Playback S${currentPlaybackSessionIndex + 1}] Cmd ${playbackIndex + 1}: J(${Math.round(command.stickX - center.x)},${Math.round(center.y - command.stickY)}) SA:${command.servoA} SB:${command.servoB}\n`;
+        commandLogDisplay.scrollTop = commandLogDisplay.scrollHeight;
+
+        playbackIndex++;
+    }
+
+    /**
+     * Stops playback of recorded commands.
+     */
+    function stopPlayback() {
+        if (!isPlaying) return;
+        isPlaying = false;
+        clearInterval(playbackIntervalId);
+        playbackIntervalId = null;
+        commandLogDisplay.textContent += `Playback finished for session ${currentPlaybackSessionIndex + 1}.\n`;
+        commandLogDisplay.scrollTop = commandLogDisplay.scrollHeight;
+        resetJoystickAndServos(); // Reset controls but NOT servos when playback stops
+        toggleActiveState(isRobotRunning);
+    }
+
+    /**
+     * Clears all recorded command sessions from the log and array.
+     */
+    function clearRecordedCommands() {
+        stopRecording(); // Ensure any active recording is stopped and saved before clearing
+        stopPlayback(); // Ensure any active playback is stopped
+
+        allRecordedSessions = [];
+        currentRecordingSession = [];
+        commandLogDisplay.textContent = 'All command sessions cleared.\n';
+        commandLogDisplay.scrollTop = commandLogDisplay.scrollHeight;
+        toggleActiveState(isRobotRunning); // Update button states after clearing
+    }
+
+    /**
+     * Displays a prompt in the log asking to replay previous sessions.
+     */
+    function promptReplayPrevious() {
+        removeReplayPrompt(); // Ensure no existing prompt buttons are hanging around
+        commandLogDisplay.textContent += '\nReplay previous recording sessions?\n';
+        // ADDED: Console log for replay prompt
+        console.log("Replay previous recording sessions? (Check UI for Yes/No buttons)");
+
+        const replayPromptContainer = document.createElement('div');
+        replayPromptContainer.id = 'replayPromptContainer';
+        replayPromptContainer.style.display = 'flex';
+        replayPromptContainer.style.justifyContent = 'center';
+        replayPromptContainer.style.gap = '10px';
+        replayPromptContainer.style.marginTop = '10px';
+
+        const replayYesBtn = document.createElement('button');
+        replayYesBtn.id = 'replayPreviousYes';
+        replayYesBtn.textContent = 'Yes';
+        // Apply some existing button styling by adding classes or inline styles
+        replayYesBtn.style.width = 'auto'; // Override fixed width
+        replayYesBtn.style.height = 'auto'; // Override fixed height
+        replayYesBtn.style.padding = '8px 15px';
+        replayYesBtn.style.borderRadius = '8px';
+        replayYesBtn.style.border = '2px solid rgba(0, 0, 0, 0.5)'; /* Black border for prompt buttons */
+        replayYesBtn.style.background = 'linear-gradient(145deg, #f0f0f0, #ffffff)'; /* White background */
+        replayYesBtn.style.color = '#000'; /* Black text */
+        replayYesBtn.style.cursor = 'pointer';
+        replayYesBtn.style.transition = 'all 0.2s ease';
+        replayYesBtn.style.boxShadow = '3px 3px 6px rgba(0,0,0,0.2), inset 2px 2px 4px rgba(0,0,0,0.3)';
+
+
+        const replayNoBtn = document.createElement('button');
+        replayNoBtn.id = 'replayPreviousNo';
+        replayNoBtn.textContent = 'No';
+        // Apply similar styling as Yes button
+        replayNoBtn.style.width = 'auto';
+        replayNoBtn.style.height = 'auto';
+        replayNoBtn.style.padding = '8px 15px';
+        replayNoBtn.style.borderRadius = '8px';
+        replayNoBtn.style.border = '2px solid rgba(0, 0, 0, 0.5)'; /* Black border for prompt buttons */
+        replayNoBtn.style.background = 'linear-gradient(145deg, #f0f0f0, #ffffff)'; /* White background */
+        replayNoBtn.style.color = '#000'; /* Black text */
+        replayNoBtn.style.cursor = 'pointer';
+        replayNoBtn.style.transition = 'all 0.2s ease';
+        replayNoBtn.style.boxShadow = '3px 3px 6px rgba(0,0,0,0.2), inset 2px 2px 4px rgba(0,0,0,0.3)';
+
+
+        replayYesBtn.addEventListener('click', () => {
+            currentPlaybackSessionIndex--; // Move to the older session
+            if (currentPlaybackSessionIndex >= 0) {
+                commandLogDisplay.textContent = `Starting playback for session ${currentPlaybackSessionIndex + 1}...\n`;
+                playbackIndex = 0; // Reset index for the new playback session
+                isPlaying = true;
+                playbackIntervalId = setInterval(executePlaybackCommand, playbackSpeed);
+                toggleActiveState(isRobotRunning); // Update button states
+            } else {
+                commandLogDisplay.textContent += '\nNo more previous recording sessions to play.\n';
+                currentPlaybackSessionIndex = -1; // Reset
+                toggleActiveState(isRobotRunning);
+            }
+            removeReplayPrompt();
+            commandLogDisplay.scrollTop = commandLogDisplay.scrollHeight;
+        });
+
+        replayNoBtn.addEventListener('click', () => {
+            commandLogDisplay.textContent += '\nReplay declined.\n';
+            currentPlaybackSessionIndex = -1; // Reset
+            removeReplayPrompt();
+            toggleActiveState(isRobotRunning);
+            commandLogDisplay.scrollTop = commandLogDisplay.scrollHeight;
+        });
+
+        replayPromptContainer.appendChild(replayYesBtn);
+        replayPromptContainer.appendChild(replayNoBtn);
+        commandLogDisplay.appendChild(replayPromptContainer);
+        commandLogDisplay.scrollTop = commandLogDisplay.scrollHeight;
+    }
+
+    /**
+     * Removes the replay prompt buttons from the log display.
+     */
+    function removeReplayPrompt() {
+        const promptContainer = document.getElementById('replayPromptContainer');
+        if (promptContainer) {
+            promptContainer.remove();
+        }
+    }
+
+
+    // --- Event Listeners ---
+
+    joy.addEventListener('pointerdown', (e) => {
+        if (!isRobotRunning || !isManualMode || isPlaying) return;
+        dragging = true;
+        joy.setPointerCapture(e.pointerId);
+        move(e); // Initial move on pointerdown
+    });
+
+    document.addEventListener('pointermove', (e) => {
+        if (dragging) {
+            move(e); // Continuous move if dragging
+        }
+        if (draggingLeft) {
+            adjustServo(e, 'A');
+        }
+        if (draggingRight) {
+            adjustServo(e, 'B');
+        }
+    });
+
+    document.addEventListener('pointerup', (e) => {
+        if (dragging) {
+            dragging = false;
+            joy.releasePointerCapture(e.pointerId);
+
+            if (joystickMode === 'spring') {
+                resetJoystickAndServos(false); // Do NOT reset servos
+            } else if (joystickMode === 'hold') {
+                // Do nothing
+            } else if (joystickMode === 'snap') {
+                let dx = stick.x - center.x;
+                let dy = stick.y - center.y;
+
+                const maxRadius = (joy.width / 2) - 25;
+
+                if (Math.hypot(dx, dy) < snapThreshold) {
+                    resetJoystickAndServos(false); // Do NOT reset servos
+                } else if (Math.abs(dx) < snapThreshold) {
+                    stick.x = center.x;
+                    motorX = 0;
+                    let snappedDy = center.y - stick.y;
+                    let normalizedSnappedDy = snappedDy / maxRadius;
+                    motorY = Math.round(normalizedSnappedDy * 255);
+                } else if (Math.abs(dy) < snapThreshold) {
+                    stick.y = center.y;
+                    motorY = 0;
+                    let snappedDx = stick.x - center.x;
+                    let normalizedSnappedDx = snappedDx / maxRadius;
+                    motorX = Math.round(normalizedSnappedDx * 255);
+                } else {
+                    resetJoystickAndServos(false); // Do NOT reset servos
+                }
+                drawAll();
+            }
+        }
+        if (draggingLeft) {
+            draggingLeft = false;
+            servoLeftCanvas.classList.remove('dragging');
+        }
+        if (draggingRight) {
+            draggingRight = false;
+            servoRightCanvas.classList.remove('dragging');
+        }
+    });
+
+    servoLeftCanvas.addEventListener('pointerdown', (e) => {
+        if (!isRobotRunning || !isManualMode || isPlaying) return;
+        draggingLeft = true;
+        servoLeftCanvas.setPointerCapture(e.pointerId);
+        adjustServo(e, 'A');
+    });
+
+    servoRightCanvas.addEventListener('pointerdown', (e) => {
+        if (!isRobotRunning || !isManualMode || isPlaying) return;
+        draggingRight = true;
+        servoRightCanvas.setPointerCapture(e.pointerId);
+        adjustServo(e, 'B');
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (!isRobotRunning || !isManualMode || isPlaying) return;
+
+        const focusedElement = document.activeElement;
+        let step = 5;
+
+        if (focusedElement === joy) {
+            move(e); // Trigger move for keyboard events on joystick
+        } else if (focusedElement === servoLeftCanvas) {
+            if (e.key === 'ArrowUp') {
+                servoA = Math.min(180, servoA + step);
+            } else if (e.key === 'ArrowDown') {
+                servoA = Math.max(0, servoA - step);
+            } else {
+                return;
+            }
+            updateAriaValues();
+            drawAll();
+            if (isRecording) {
+                recordCurrentState();
+            }
+            e.preventDefault();
+        } else if (focusedElement === servoRightCanvas) {
+            if (e.key === 'ArrowUp') {
+                servoB = Math.min(180, servoB + step);
+            } else if (e.key === 'ArrowDown') {
+                servoB = Math.max(0, servoB - step);
+            } else {
+                return;
+            }
+            updateAriaValues();
+            drawAll();
+            if (isRecording) {
+                recordCurrentState();
+            }
+            e.preventDefault();
+        }
+    });
+
+    manualModeBtn.addEventListener('click', () => {
+        isManualMode = !isManualMode;
+        if (isRobotRunning) {
+            updateStatusElements();
+        }
+    });
+
+    joystickModeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            if (!isRobotRunning || !isManualMode || isPlaying) return;
+            joystickMode = button.id.replace('mode', '').replace('Btn', '').toLowerCase();
+            if (joystickMode === 'spring') {
+                resetJoystickAndServos(false); // Do NOT reset servos on mode change to spring
+            }
+            toggleActiveState(isRobotRunning);
+        });
+    });
+
+    liveClock.addEventListener('click', () => {
+        is24HourFormat = !is24HourFormat;
+        updateClock();
+    });
+
+    themeBtn.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+        const icon = themeBtn.querySelector('i');
+        if (document.body.classList.contains('light-mode')) {
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+            themeBtn.setAttribute('aria-label', 'Toggle Dark Theme');
+        } else {
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
+            themeBtn.setAttribute('aria-label', 'Toggle Light Theme');
+        }
+        drawAll(); // Redraw canvases to update colors
+    });
+
+    startStopBtn.addEventListener('click', () => {
+        isRobotRunning = !isRobotRunning;
+        updateStatusElements();
+    });
+
+    recordBtn.addEventListener('click', startRecording); // Now directly calls startRecording to handle toggle logic
+
+    playBtn.addEventListener('click', startPlayback); // Now directly calls startPlayback to handle toggle logic
+
+    clearRecordingsBtn.addEventListener('click', clearRecordedCommands);
+
+
+    // --- Modal Logic ---
+    const robotData = {
+        robotStatus: {
+            temperature: "25°C",
+            humidity: "60%",
+            systemStatus: "OK",
+            battery: {
+                level: "85%",
+                voltage: "12.8V",
+                cycles: "150",
+                health: "Good"
+            },
+            parts: [
+                { name: "Left Motor", status: "Operational", hours: "500", temp: "30°C" },
+                { name: "Right Motor", "status": "Operational", hours: "500", temp: "31°C" },
+                { name: "Main Processor", "status": "Running", load: "45%", temp: "40°C" },
+                { name: "Camera Module", "status": "Active", resolution: "1080p" },
+                { name: "Arm Actuator", "status": "Standby", lastUse: "2 hours ago" }
+            ]
+        },
+        componentDetails: {
+            microcontroller: {
+                name: "Microcontroller (MCU)",
+                status: "Online",
+                cpuUsage: "15%",
+                memoryUsage: "30%",
+                firmwareVersion: "v1.2.0",
+                temp: "35°C",
+                displayDetail: "ESP 32 DevKit"
+            },
+            motor: { // This refers to the motor board/driver
+                name: "Motor Driver",
+                status: "Active",
+                channels: "4",
+                voltageOutput: "12V",
+                currentDraw: "2.5A (Avg)",
+                temp: "45°C",
+                displayDetail: "N20 Motors with a speed of 30 rpm and a DRV8833 motor driver."
+            },
+            servos: {
+                name: "Servo System",
+                status: "Ready",
+                count: "2",
+                model: "SG90",
+                powerConsumption: "Low",
+                displayDetail: "MG90S"
+            },
+            // Note: The 'motors' key was a bit redundant, merging its display logic into 'motor' as 'motorDriver'
+            boost: {
+                name: "Boost Regulator",
+                status: "Stable",
+                inputVoltage: "7.4V",
+                outputVoltage: "12V",
+                efficiency: "92%",
+                displayDetail: "CA6009"
+            },
+            battery: {
+                name: "Battery Pack",
+                level: "85%",
+                voltage: "12.8V",
+                cycles: "150",
+                health: "Good",
+                type: "LiPo 3S",
+                capacity: "5000mAh",
+                displayDetail: "18650 Lithium-Ion Battery with Voltage = 3.7 V and Capacity of 3500 milliampere hour."
+            }
+        }
+    };
+
+    async function displayStatusReport(type) {
+        statusModalOverlay.classList.add('visible');
+        loadingIndicator.classList.add('visible');
+        modalBodyContent.innerHTML = '';
+
+        let title = "";
+        let componentData = robotData.componentDetails[type];
+
+        if (!componentData) {
+            modalBodyContent.innerHTML = `<p class="status-error">Component data for "${type}" not found. This component might have been removed.</p>`;
+            loadingIndicator.classList.remove('visible');
+            return;
+        }
+
+        // Handle specific display details for certain components, or general report
+        if (componentData.hasOwnProperty('displayDetail')) {
+            title = `${componentData.name} Details`;
+            modalBodyContent.innerHTML = `<p>${componentData.displayDetail}</p>`;
+            loadingIndicator.classList.remove('visible');
+            modalTitle.textContent = title;
+            return; // Exit function after displaying specific detail
+        } else {
+            // General report generation using LLM for other components/overall status
+            title = `${componentData.name} Details`; // Default title for other components
+            if (type === 'overall') {
+                title = "Overall Robot Status";
+            }
+            const prompt = `Generate a concise report for the following robot component based on the JSON data. Do NOT include the word "Status" in your generated response. Focus on readability and present key information.
+${JSON.stringify(componentData, null, 2)}`;
+
+            modalTitle.textContent = title;
+
+            try {
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiKey = ""
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    let text = result.candidates[0].content.parts[0].text;
+                    text = text.replace(/Status: /g, '').replace(/Status /g, ''); // Remove "Status" keyword
+
+                    let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+                    // Apply status highlighting
+                    formattedText = formattedText.replace(/OK/g, '<span class="status-ok">OK</span>');
+                    formattedText = formattedText.replace(/Operational/g, '<span class="status-ok">Operational</span>');
+                    formattedText = formattedText.replace(/Running/g, '<span class="status-ok">Running</span>');
+                    formattedText = formattedatedText.replace(/Online/g, '<span class="status-ok">Online</span>');
+                    formattedText = formattedText.replace(/Active/g, '<span class="status-ok">Active</span>');
+                    formattedText = formattedText.replace(/Ready/g, '<span class="status-ok">Ready</span>');
+                    formattedText = formattedText.replace(/Stable/g, '<span class="status-ok">Stable</span>');
+                    formattedText = formattedText.replace(/Warning/g, '<span class="status-warning">Warning');
+                    formattedText = formattedText.replace(/Error/g, '<span class="status-error">Error</span>');
+                    formattedText = formattedText.replace(/Critical/g, '<span class="status-error">Critical</span>');
+
+                    modalBodyContent.innerHTML = formattedText;
+                } else {
+                    modalBodyContent.innerHTML = '<p class="status-error">Failed to generate report. Please try again.</p>';
+                    console.error('Gemini API response structure unexpected:', result);
+                }
+            } catch (error) {
+                modalBodyContent.innerHTML = '<p class="status-error">Error fetching report. Please check your network connection or try again later.</p>';
+                console.error('Error calling Gemini API:', error);
+            } finally {
+                loadingIndicator.classList.remove('visible');
+            }
+        }
+    }
+
+    componentButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const componentType = button.dataset.component;
+            // Map the button data-component to the actual key in robotData.componentDetails
+            let actualComponentType = componentType;
+            if (componentType === 'motorDriver') { // 'motorDriver' button shows 'motor' data
+                actualComponentType = 'motor';
+            } else if (componentType === 'boostConverter') {
+                actualComponentType = 'boost';
+            }
+            // All other button types directly match keys in robotData.componentDetails
+
+            if (robotData.componentDetails.hasOwnProperty(actualComponentType)) {
+                displayStatusReport(actualComponentType);
+            } else {
+                statusModalOverlay.classList.add('visible');
+                loadingIndicator.classList.remove('visible');
+                modalTitle.textContent = "Component Not Found";
+                modalBodyContent.innerHTML = `<p class="status-warning">Details for "${componentType}" are not available or the component has been removed from the interface.</p>`;
+            }
+        });
+    });
+
+    modalCloseBtn.addEventListener('click', () => {
+        statusModalOverlay.classList.remove('visible');
+    });
+
+    statusModalOverlay.addEventListener('click', (e) => {
+        if (e.target === statusModalOverlay) {
+            statusModalOverlay.classList.remove('visible');
+        }
+    });
+
+    window.onload = function () {
+        updateClock();
+        setInterval(updateClock, 1000);
+        updateStatusElements();
+        initializeParameterDisplays();
+
+        joy.classList.remove('active');
+        servoLeftCanvas.classList.remove('active');
+        servoRightCanvas.classList.remove('active');
+        joy.setAttribute('tabindex', '-1');
+        servoLeftCanvas.setAttribute('tabindex', '-1');
+        servoRightCanvas.setAttribute('tabindex', '-1');
+
+        modeSpringBtn.classList.add('active-mode');
+
+        drawAll();
+    };
+
+    function initializeParameterDisplays() {
+        motorXVal.textContent = '0';
+        motorYVal.textContent = '0';
+        servoAVal.textContent = '90';
+        servoBVal.textContent = '90';
+    }
+</script>
+</body>
+</html>
